@@ -1,13 +1,11 @@
 import streamlit as st
 import google.generativeai as genai
 
-st.set_page_config(
-    page_title="Hello",
-    page_icon="👋",
-)
+from settings import CODES
+import utils
 
 # Show title and description.
-st.title("📄 Interview Agent")
+# st.title("📄 Interview Agent")
 
 gemini_api_key = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=gemini_api_key)
@@ -25,17 +23,20 @@ for message in st.session_state["messages"]:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Let the user upload a file via `st.file_uploader`.
-jd_file = st.sidebar.file_uploader(
-    "Upload the Job Description (.txt or .md)", type=("txt", "md")
-)
-cv_file = st.sidebar.file_uploader(
-    "Upload the Candidate Profile (.txt or .md)", type=("txt", "md")
-)
 
-if jd_file and cv_file:
-    jd_document = jd_file.read().decode()
-    cv_document = cv_file.read().decode()
+code = st.session_state.code
+application = CODES[code]
+
+jd_filename = application["job"]["filename"]
+jd_filepath = utils.get_filepath("job", jd_filename)
+
+profile_filename = application["candidate"]["filename"]
+profile_filepath = utils.get_filepath("candidate", profile_filename)
+
+
+if profile_filepath and profile_filepath:
+    jd_document = utils.read_file(jd_filepath)
+    cv_document = utils.read_file(profile_filepath)
 
     model_instruction = (
         "You will be responsible for automatically conducting interviews with candidates in English. Your tasks include:"
