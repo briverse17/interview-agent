@@ -1,7 +1,6 @@
-import streamlit as st
 # from openai import OpenAI
 import google.generativeai as genai
-
+import streamlit as st
 
 # Show title and description.
 st.title("📄 Document question answering")
@@ -24,7 +23,7 @@ else:
     # Create an OpenAI client.
     # client = OpenAI(api_key=openai_api_key)
     genai.configure(api_key=gemini_api_key)
-    client = genai.GenerativeModel('gemini-1.5-flash')
+    client = genai.GenerativeModel("gemini-1.5-flash")
     chat = client.start_chat(history=[])
 
     # Let the user upload a file via `st.file_uploader`.
@@ -47,7 +46,9 @@ else:
             {
                 "role": "user",
                 # "content": f"Here's a document: {document} \n\n---\n\n {question}",
-                "parts": [f"Here's Markdown a document: {document} \n\n---\n\n {question}"],
+                "parts": [
+                    f"Here's Markdown a document: {document} \n\n---\n\n {question}"
+                ],
             }
         ]
 

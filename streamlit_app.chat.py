@@ -1,5 +1,5 @@
-import streamlit as st
 import google.generativeai as genai
+import streamlit as st
 
 # Show title and description.
 st.title("📄 Interview Agent")
@@ -44,14 +44,11 @@ if jd_file and cv_file:
     )
 
     model = genai.GenerativeModel(
-        st.session_state["gemini_model"],
-        system_instruction=model_instruction
+        st.session_state["gemini_model"], system_instruction=model_instruction
     )
     chat = model.start_chat(history=[])
 
-    initial_prompt = (
-        f"First, ask the candidate how they are feeling and ask them to briefly introduce themself."
-    )
+    initial_prompt = f"First, ask the candidate how they are feeling and ask them to briefly introduce themself."
 
     if len(st.session_state["messages"]) == 0:
         with st.chat_message("assistant"):
@@ -79,4 +76,3 @@ if jd_file and cv_file:
             st.session_state.messages.append(
                 {"role": "assistant", "content": response.text}
             )
-

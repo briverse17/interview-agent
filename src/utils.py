@@ -1,6 +1,6 @@
 import os
 
-from settings import DIRECTORIES
+from src.settings import APPLICATIONS, DIRECTORIES
 
 
 def get_filepath(type: str, filename: str):
@@ -8,7 +8,12 @@ def get_filepath(type: str, filename: str):
     if os.path.isfile(filepath):
         return os.path.join(DIRECTORIES[type], filename)
 
+
 def read_file(filepath: str):
     with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
         return content
+
+
+def get_application(code: str):
+    return APPLICATIONS.get(code)
