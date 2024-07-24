@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_user_device import user_device
 
 import src.utils as utils
 
@@ -14,6 +15,10 @@ if "code" not in st.session_state:
 if "step" not in st.session_state:
     st.session_state["step"] = None
 
+if "device" not in st.session_state:
+    st.session_state["device"] = user_device()
+
+
 STEPS = [None, "Home", "Interview", "End"]
 
 
@@ -22,23 +27,33 @@ def login():
     code = st.text_input(
         "Interview code", placeholder="aie-nmv", autocomplete="aie-nmv"
     )
+    container = st.container(border=1)
+    container.caption("Details")
     if not code:
-        st.warning(
-            "Please enter the interview code provided in the email",
+        st.session_state["code"] = None
+        container.warning(
+            "Please enter the Interview Code",
             icon=":material/person_alert:",
+        )
+        container.info(
+            "It can be found in the invitation",
+            icon=":material/info:",
         )
     else:
         application = utils.get_application(code)
         if not application:
-            st.warning(
+            st.session_state["code"] = None
+            container.warning(
                 f"Interview code '{code}' not found",
                 icon=":material/person_alert:",
             )
+            container.info(
+                "Please check the invitation",
+                icon=":material/info:",
+            )
         else:
+            st.session_state["code"] = code
             application = utils.get_application(code)
-
-            container = st.container(border=1)
-            container.caption("Details")
 
             jd_filename = application["job"]["filename"]
             jd_filepath = utils.get_filepath("job", jd_filename)
@@ -48,10 +63,12 @@ def login():
                     icon=":material/data_alert:",
                 )
             else:
-                container.success(f"**Job Description found at: `{jd_filename}`**")
+                container.success(
+                    f"**Job Description found at: `{jd_filename}`**")
 
             profile_filename = application["candidate"]["filename"]
-            profile_filepath = utils.get_filepath("candidate", profile_filename)
+            profile_filepath = utils.get_filepath(
+                "candidate", profile_filename)
             if not profile_filepath:
                 container.warning(
                     f"Candidate Profile not found. Please contact HR.",
@@ -61,11 +78,10 @@ def login():
                 container.success(
                     f"**Candidate Profile found at: `{profile_filename}`**"
                 )
-
+            
             st.balloons()
 
-    if st.button("Next", type="primary", disabled=not code, use_container_width=True):
-        st.session_state["code"] = code
+    if st.button("Start", type="primary", disabled=not st.session_state["code"], use_container_width=True):
         st.session_state["step"] = "Interview"
         st.rerun()
 
