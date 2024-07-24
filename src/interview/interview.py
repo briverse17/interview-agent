@@ -1,4 +1,3 @@
-import time
 from typing import List
 
 import streamlit as st
@@ -10,14 +9,7 @@ from src.settings import MODEL_INSTRUCTIONS, MODEL_NAME
 code: str = st.session_state["code"]
 application = utils.get_application(code)
 
-jd_filename = application["job"]["filename"]
-jd_filepath = utils.get_filepath("job", jd_filename)
-
-profile_filename = application["candidate"]["filename"]
-profile_filepath = utils.get_filepath("candidate", profile_filename)
-
-jd_document = utils.read_file(jd_filepath)
-profile_document = utils.read_file(profile_filepath)
+jd_document, profile_document = utils.get_documents(application)
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -33,16 +25,18 @@ if "service" not in st.session_state:
         ),
     )
 
+
 @st.experimental_dialog("Tips")
 def tips():
     st.info(
-        ":blue[Click the **>** button to open the sidebar]",
+        ":blue[Click the `>` button to open the sidebar]",
         icon=":material/chevron_right:",
     )
-    st.info(
-        ":blue[Move the cursor to the right edge of the sidebar to resize it]",
-        icon=":material/width:",
-    )
+    if st.session_state["device"] != "mobile":
+        st.info(
+            ":blue[Move the cursor to the right edge of the sidebar to resize it]",
+            icon=":material/width:",
+        )
     if st.button("Thanks"):
         st.rerun()
 
