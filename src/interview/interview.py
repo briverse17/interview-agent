@@ -4,7 +4,7 @@ from typing import List
 import streamlit as st
 
 import src.utils as utils
-from src.model import model
+from src.service.service import Service
 from src.settings import MODEL_INSTRUCTIONS, MODEL_NAME
 
 code: str = st.session_state["code"]
@@ -25,7 +25,7 @@ if "messages" not in st.session_state:
 
 # Initialize service
 if "service" not in st.session_state:
-    st.session_state["service"] = model.Service(
+    st.session_state["service"] = Service(
         MODEL_NAME,
         MODEL_INSTRUCTIONS["system"].format(
             jd_document=jd_document,
@@ -55,7 +55,7 @@ with st.sidebar.expander("Candidate Profile"):
 
 
 messages: List = st.session_state["messages"]
-service: model.Service = st.session_state["service"]
+service: Service = st.session_state["service"]
 
 
 # Display chat messages from history on app rerun
