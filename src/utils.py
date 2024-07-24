@@ -15,5 +15,16 @@ def read_file(filepath: str):
         return content
 
 
+def get_documents(application):
+    jd_filename = application["job"]["filename"]
+    jd_filepath = get_filepath("job", jd_filename)
+
+    profile_filename = application["candidate"]["filename"]
+    profile_filepath = get_filepath("candidate", profile_filename)
+
+    jd_document = read_file(jd_filepath)
+    profile_document = read_file(profile_filepath)
+    return jd_document, profile_document
+
 def get_application(code: str):
     return APPLICATIONS.get(code)
