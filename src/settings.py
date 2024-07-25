@@ -1,5 +1,7 @@
 import streamlit as st
 
+SUPPORTED_FILETYPES = ["md", "txt"]
+
 DIRECTORIES = {
     "job": "data/jobs/",
     "candidate": "data/candidates/",
