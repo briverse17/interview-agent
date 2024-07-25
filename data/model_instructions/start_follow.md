@@ -6,3 +6,5 @@ Task:
 - Else, encourage the candidate adjust their answer accordingly
 ---
 {history}
+
+{questions}
