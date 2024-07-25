@@ -59,10 +59,10 @@ class HistoryEntry:
 
 class Instructions:
     def __init__(self, prefix: str) -> None:
-        primary_filepath = get_filepath("instruction", f"{prefix}.md")
-        questions_filepath = get_filepath("instruction", f"{prefix}_questions.md")
-        eval_filepath = get_filepath("instruction", f"{prefix}_eval.md")
-        follow_filepath = get_filepath("instruction", f"{prefix}_follow.md")
+        primary_filepath = get_filepath("instruction", prefix, "primary.md")
+        questions_filepath = get_filepath("instruction", prefix, "questions.md")
+        eval_filepath = get_filepath("instruction", prefix, "eval.md")
+        follow_filepath = get_filepath("instruction", prefix, "follow.md")
 
         self.primary = Document(primary_filepath, f"{prefix}".upper())
         self.questions = Document(questions_filepath, f"{prefix}_questions".upper())
