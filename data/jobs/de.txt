@@ -1,0 +1,67 @@
+
+About the job
+Job description:
+
+About GFT
+
+GFT Technologies is driving the digital transformation of the world’s leading financial institutions. Other sectors, such as industry and insurance, also leverage GFT’s strong consulting and implementation skills across all aspects of pioneering technologies, such as cloud engineering, artificial intelligence, the Internet of Things for Industry 4.0, and blockchain.
+
+With its in-depth technological expertise, strong partnerships and scalable IT solutions, GFT increases productivity in software development. This provides clients with faster access to new IT applications and innovative business models, while also reducing risk.
+
+We’ve been a pioneer of near-shore delivery since 2001 and now offer an international team spanning 16 countries with a global workforce of over 9,000 people around the world. GFT is recognised by industry analysts, such as Everest Group, as a leader amongst the global mid-sized Service Integrators and ranked in the Top 20 leading global Service Integrators in many of the exponential technologies such as Open Banking, Blockchain, Digital Banking, and Apps Services.
+
+ 
+
+Role Summary: As a Data Engineer at GFT, you will contribute to designing, maintaining, and enhancing various data services and infrastructure. You'll work with cross-functional teams to ensure seamless data flow for critical decision-making processes.
+
+Key Activities:
+
+    - Data Infrastructure Design and Maintenance: Support the architecture, maintenance, and enhancement of analytical and operational services and infrastructure, including data lakes, databases, data pipelines, and metadata repositories. 
+    - Collaboration: Assist in designing and implementing data schemas and models, integrating new data sources, and collaborating with other data engineers to implement cutting-edge technologies. 
+    - Data Processing: Develop and optimize data processing systems to support the organization's growth and improvement initiatives. 
+    - Workflow Management: Use workflow scheduling and monitoring tools like Apache Airflow to ensure efficient data processing and management. 
+    - Quality Assurance: Implement testing strategies to ensure the reliability and usability of data processing systems. 
+    - Continuous Improvement: Stay updated on emerging technologies and best practices in data engineering and propose optimizations. 
+
+ 
+
+Required Skills:
+ 
+
+    - Technical Expertise: Proficient in Unix environments, cloud computing (GCP), Python frameworks (e.g., pandas, pyspark), version control systems (e.g., git), and workflow scheduling tools (e.g., Apache Airflow). 
+    - Database Proficiency: Experience with columnar and big data databases like Athena, Redshift, and Hive/Hadoop. 
+    - Containerization: Experience with container management tools like Docker and Kubernetes. 
+    - CI/CD: Knowledge of CI/CD tools such as Jenkins or CircleCI. 
+    - Experience: Minimum of 3 years of experience in data engineering or related fields. 
+
+ 
+
+ 
+
+Nice-to-have requirements: 
+
+ 
+ 
+
+    - Programming Languages: Familiarity with JVM languages like Java or Scala. 
+    - Database Technologies: Experience with RDBMS (e.g., MySQL, PostgreSQL) and NoSQL databases (e.g., DynamoDB). 
+    - BI Tools: Exposure to enterprise BI tools like Tableau or PowerBI. 
+    - Data Science Environments: Understanding of data science environments like AWS Sagemaker or Databricks. 
+    - Monitoring and Logging: Knowledge of log ingestion and monitoring tools like ELK stack or Datadog. 
+    - Cloud Services: Familiarity with GCP services like Dataflow, BigQuery, Compute Engine, Cloud Storage, and Cloud Functions. 
+    - Data Privacy and Security: Understanding of data privacy and security tools and concepts. 
+    - Messaging Systems: Familiarity with distributed messaging systems like Kafka. 
+
+ 
+
+ 
+
+What can we offer you?
+
+    Competitive salary
+    13th-month salary guarantee
+    Performance bonus
+    Professional English course for employees
+    Premium health insurance
+    Extensive annual leave
+
