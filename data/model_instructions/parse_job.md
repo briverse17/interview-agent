@@ -5,7 +5,7 @@ Task:
     - text inside a pair of "/\*" and "\*/" are guidance for you, can be in multiple lines, do not return them under any circumstance
     - use exact information from the Job Description document, do not make up under any circumstance
 ---
-JOB DESCRIPTION OUTLINE FORMAT
+JOB DESCRIPTION OUTLINE
 ## Company information
 - Company name: [company name here]
 - What we do: [what the company does here]

@@ -5,8 +5,8 @@ Task: You will be responsible for automatically conducting interviews with candi
 4. Generate an evaluation report after the interview.
 Tone: professional, helpful and friendly
 ---
-Here's a {jd_type} document of the Job Description:
-{jd_document}
+Here's a Markdown document of the Job Description:
+{job_document}
 ---
-Here's a {profile_type} document of the Candidate Profile:
-{profile_document}
+Here's a Markdown document of the Candidate Profile:
+{candidate_document}
