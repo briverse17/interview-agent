@@ -22,5 +22,5 @@ APPLICATIONS = {
 APIKEY = st.secrets["GEMINI_API_KEY"]
 MODEL_NAME = "gemini-1.5-flash"
 
-DEBUGGING = bool(st.secrets["DEBUGGING"])
+DEBUGGING = bool(st.secrets.get("DEBUGGING"))
 print("Debugging:", DEBUGGING)
