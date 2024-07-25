@@ -44,7 +44,7 @@ with st.sidebar.expander("Job Description") as ex:
 # Initialize service
 if "service" not in st.session_state:
     with st.spinner("Processing..."):
-        st.session_state["service"] = _service.Service(settings.MODEL_NAME, application)
+        st.session_state["service"] = _service.Service(settings.MODEL_NAME, code)
     show_tips()
 
 
@@ -57,19 +57,24 @@ for message in messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if not service.started:
+if not service.phase:
     with st.chat_message("assistant"):
-        instruction = utils.get_instruction("start")
-        chunks = service.start(instruction)
+        chunks = service.update("start")
         response = st.write_stream(chunks)
         messages.append({"role": "assistant", "content": response})
+        service.update_report("question", response)
 
 if prompt := st.chat_input("Your message..."):
     messages.append({"role": "user", "content": prompt})
+    service.update_report("answer", prompt)
     with st.chat_message("user"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        chunks = service.chat(prompt)
-        response = st.write_stream(chunks)
-        messages.append({"role": "assistant", "content": response})
+        evaluation = service.eval()
+        next_phase, primary = service.follow()
+        with st.spinner("Processing..."):
+            chunks = service.update(next_phase, primary)
+            response = st.write_stream(chunks)
+            messages.append({"role": "assistant", "content": response})
+            service.update_report("question", response)

@@ -1,5 +1,6 @@
+import json
 import os
-from typing import Dict
+from typing import Dict, List
 
 import src.settings as settings
 
@@ -29,6 +30,11 @@ def read_file(filepath: str) -> str:
 def write_file(filepath: str, content: str):
     with open(filepath, "w+", encoding="utf-8") as f:
         f.write(content)
+
+
+def write_json(filepath: str, content: Dict | List):
+    with open(filepath, "w+", encoding="utf-8") as f:
+        json.dump(content, f, indent=2, ensure_ascii=False)
 
 
 def set_filetypes(application: Dict) -> Dict:
