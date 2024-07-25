@@ -16,7 +16,7 @@ if "step" not in st.session_state:
     st.session_state["step"] = None
 
 if "device" not in st.session_state:
-    st.session_state["device"] = user_device()
+    st.session_state["device"] = "desktop"
 
 
 STEPS = [None, "Home", "Interview", "End"]
@@ -55,40 +55,54 @@ def login():
             st.session_state["code"] = code
             application = utils.get_application(code)
 
-            jd_filename = application["job"]["filename"]
-            jd_filepath = utils.get_filepath("job", jd_filename)
-            if not jd_filepath:
-                container.warning(
-                    f"Job Description not found. Please contact HR.",
+            try:
+                application = utils.set_filetypes(application)
+                application = utils.set_filepaths(application)
+                container.success(
+                    f"**Job Description found at: `{application['job']['filename']}`**",
+                    icon=(
+                        ":material/markdown:"
+                        if application["job"]["filetype"] == "Markdown"
+                        else ":material/text_snippet:"
+                    ),
+                )
+                container.success(
+                    f"**Candidate Profile found at: `{application['candidate']['filename']}`**",
+                    icon=(
+                        ":material/markdown:"
+                        if application["candidate"]["filetype"] == "Markdown"
+                        else ":material/text_snippet:"
+                    ),
+                )
+                utils.set_application(code, application)
+
+            except (
+                utils.DocumentTypeNotSupportedError,
+                utils.DocumentNotFoundError,
+            ) as e:
+                container.error(
+                    f"An error occured:\n{e.args[0]}",
                     icon=":material/data_alert:",
                 )
-            else:
-                container.success(
-                    f"**Job Description found at: `{jd_filename}`**")
-
-            profile_filename = application["candidate"]["filename"]
-            profile_filepath = utils.get_filepath(
-                "candidate", profile_filename)
-            if not profile_filepath:
                 container.warning(
-                    f"Candidate Profile not found. Please contact HR.",
-                    icon=":material/data_alert:",
+                    f"Please contact HR",
+                    icon=":material/person_raised_hand:",
                 )
-            else:
-                container.success(
-                    f"**Candidate Profile found at: `{profile_filename}`**"
-                )
-            
-            st.balloons()
 
-    if st.button("Start", type="primary", disabled=not st.session_state["code"], use_container_width=True):
+    start_button = st.button(
+        "Start",
+        type="primary",
+        disabled=not st.session_state["code"],
+        use_container_width=True,
+    )
+    # device info
+    device = user_device()
+    st.session_state["device"] = device
+
+    if start_button:
         st.session_state["step"] = "Interview"
         st.rerun()
 
-
-# def logout():
-#     st.session_state.role = None
-#     st.rerun()
 
 st.title("📄 Interview Agent")
 st.write("## Welcome! 👋")
