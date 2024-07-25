@@ -26,6 +26,11 @@ def read_file(filepath: str) -> str:
             raise DocumentBlankError(f"Document is blank: {filename}")
 
 
+def write_file(filepath: str, content: str):
+    with open(filepath, "w+", encoding="utf-8") as f:
+        f.write(content)
+
+
 def set_filetypes(application: Dict) -> Dict:
     for type in ("job", "candidate"):
         if "filetype" not in application[type]:
@@ -42,8 +47,8 @@ def set_filetypes(application: Dict) -> Dict:
     return application
 
 
-def get_filepath(type: str, filename: str):
-    return os.path.join(settings.DIRECTORIES[type], filename)
+def get_filepath(dirname: str, filename: str):
+    return os.path.join(settings.DIRECTORIES[dirname], filename)
 
 
 def set_filepaths(application: Dict) -> Dict:
@@ -81,10 +86,9 @@ def add_debug(*args):
         print(*args, sep="\n")
 
 
-def get_instruction(step: str, **kwargs):
-    filename = settings.MODEL_INSTRUCTIONS[step]
+def get_instruction(name: str, **kwargs):
+    filename = f"{name}.md"
     filepath = get_filepath("instruction", filename)
     template = read_file(filepath)
-    if settings.DEBUGGING:
-        add_debug(f"{step} instruction template".upper(), template)
-    return template.format(**kwargs)
+    instruction = template.format(**kwargs)
+    return instruction

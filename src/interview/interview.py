@@ -39,21 +39,13 @@ profile_type = application["candidate"]["filetype"]
 profile_document = application["candidate"]["document"]
 
 with st.sidebar.expander("Job Description") as ex:
-    st.markdown(jd_document)
-
-with st.sidebar.expander("Candidate Profile"):
-    st.markdown(profile_document)
+    st.write(jd_document)
 
 # Initialize service
 if "service" not in st.session_state:
-    instruction = utils.get_instruction(
-        "system",
-        jd_type=jd_type,
-        profile_type=profile_type,
-        jd_document=jd_document,
-        profile_document=profile_document,
-    )
-    st.session_state["service"] = _service.Service(settings.MODEL_NAME, instruction)
+    with st.spinner("Processing..."):
+        st.session_state["service"] = _service.Service(settings.MODEL_NAME, application)
+    show_tips()
 
 
 messages: List = st.session_state["messages"]
@@ -66,7 +58,6 @@ for message in messages:
         st.markdown(message["content"])
 
 if not service.started:
-    show_tips()
     with st.chat_message("assistant"):
         instruction = utils.get_instruction("start")
         chunks = service.start(instruction)
