@@ -4,7 +4,6 @@ import streamlit as st
 
 from src.service.application import Application
 from src.service.llm import LLM
-from src.service.phase import HistoryEntryItem, Phase
 from src.settings import MODEL_NAME
 
 application: Application = st.session_state["application"]
@@ -14,6 +13,11 @@ device: str = st.session_state["device"]
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
+if "report" not in st.session_state:
+    st.session_state["report"] = None
+
+if "terminated" not in st.session_state:
+    st.session_state["terminated"] = None
 
 @st.experimental_dialog("Tips")
 def show_tips():
@@ -30,6 +34,11 @@ def show_tips():
 
     if st.button("Thanks"):
         st.rerun()
+
+
+@st.experimental_dialog("Report", width="large")
+def show_report():
+    st.markdown(st.session_state["report"])
 
 
 with st.sidebar.expander("Job Description") as ex:
@@ -51,20 +60,36 @@ for item in llm.chat_history:
     with st.chat_message(item.st_role):
         st.markdown(item.content)
 
-if not llm.current_phase:
-    with st.chat_message("assistant"):
-        chunks = llm.update("start")
-        response = st.write_stream(chunks)
-        llm.current_phase.update_history("question", response)
 
-if prompt := st.chat_input("Your message..."):
-    llm.current_phase.update_history("answer", prompt)
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    with st.chat_message("assistant"):
-        llm.eval()
+if st.session_state["terminated"]:
+    if not st.session_state["report"]:
         with st.spinner("Processing..."):
-            chunks = llm.update(*llm.follow())
-            response = st.write_stream(chunks)
-            llm.current_phase.update_history("question", response)
+            llm.current_phase.history.update("answer", "")
+            st.session_state["report"] = llm.make_report()
+        st.rerun()
+    else:
+        if st.button("Complete", use_container_width=True, type="primary"):
+            show_report()
+else:
+    if not llm.current_phase:
+        msg = st.chat_message("assistant")
+        with st.spinner("Processing..."):
+            chunks = llm.update("start")
+        response = msg.write_stream(chunks)
+        llm.current_phase.history.update("question", response)
+
+    if prompt := st.chat_input("Your message..."):
+        llm.current_phase.history.update("answer", prompt)
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        msg = st.chat_message("assistant")
+        with st.spinner("Processing..."):
+            llm.eval()
+            chunks = llm.update(*llm.proceed())
+        response = msg.write_stream(chunks)
+        llm.current_phase.history.update("question", response)
+
+        llm.dump_conversations()
+
+    st.session_state["terminated"] = llm.terminated

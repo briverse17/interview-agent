@@ -20,18 +20,10 @@ def write_json(filepath: str, content: Dict | List):
         json.dump(content, f, indent=2, ensure_ascii=False)
 
 
-def get_filepath(dirname: str, filename: str) -> str:
-    return os.path.join(settings.DIRECTORIES[dirname], filename)
+def get_path(dirname: str, basename: str) -> str:
+    return os.path.join(settings.DIRECTORIES[dirname], basename)
 
 
 def add_debug(*args):
     if settings.DEBUGGING:
         print(*args, sep="\n")
-
-
-# def get_instruction(name: str, **kwargs):
-#     filename = f"{name}.md"
-#     filepath = get_filepath("instruction", filename)
-#     template = read_file(filepath)
-#     instruction = template.format(**kwargs)
-#     return instruction

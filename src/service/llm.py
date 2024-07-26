@@ -1,14 +1,13 @@
 import os
 import time
-from typing import Dict, List
 
 import google.generativeai as genai
 
 from src.service.application import Application, ApplicationData
 from src.service.document import Document
-from src.service.phase import HistoryEntryItem, Phase, Phases, PhaseUpdateType
+from src.service.phase import Phase, Phases, PhaseUpdateType
 from src.settings import APIKEY
-from src.utils import add_debug, get_filepath, read_file, write_file, write_json
+from src.utils import add_debug, get_path, read_file, write_file, write_json
 
 
 class LLM:
@@ -21,51 +20,81 @@ class LLM:
         self.session = self.model.start_chat(history=[])
         self.phases = Phases()
         self.current_phase: Phase = None
+        self.terminated = False
 
     @property
     def chat_history(self):
-        for phase_name in ("start", "technical", "behavioral", "experience", "qna", "finish"):
-            phase: Phase = getattr(self.phases, phase_name)
-            for entry in phase.history:
-                for item_name in ("question", "answer"):
-                    item: HistoryEntryItem = getattr(entry, item_name, None)
-                    if item:
-                        yield item
+        return self.phases.history
 
-    def single(self, content):
-        return self.model.generate_content(content).text
+    def single(self, content=None):
+        history = self.phases.api_history
+        if content:
+            history.append({"role": "user", "parts": [content]})
+        return self.model.generate_content(history).text
 
     def stream(self, content):
         response = self.session.send_message(content, stream=True)
         for chunk in response:
             yield chunk.text.rstrip("\n")
 
-    # def write_report(self):
-    #     report_filepath = get_filepath("report", f"{self.code}_{self.timestamp}.json")
-    #     write_json(report_filepath, self.report)
+    def make_report(self):
+        report = self.single(
+            (
+                "Process the whole conversation and make a report conforming the following format"
+                "---"
+                "SCREENING REPORT FOR [CANDIDATE FULLNAME]"
+                "## Overview"
+                "/* List your general assessments of the candidate as bullet points */"
+                "/* No more than 4 points */"
+                "## Technical"
+                "/* List your assessments of the technical fit between the candidate and the job as bullet points */"
+                "/* No more than 5 points */"
+                "## Behavioral"
+                "/* List your assessments of the behavioral fit between the candidate and the job as bullet points */"
+                "/* No more than 5 points */"
+                "## Conclusion"
+                "/* List your subjective conclusion on whether the company should proceed with this application as bullet points */"
+                "/* No more than 3 points */"
+            )
+        )
+        filepath = get_path(
+            "report", f"{self.application.id}_{self.timestamp}.md"
+        )
+        write_file(filepath, report)
+        return report
+
+    def dump_conversations(self):
+        filepath = get_path(
+            "conversation", f"{self.application.id}_{self.timestamp}.json"
+        )
+        write_json(filepath, self.phases.__dict__())
 
     def eval(self):
         self.current_phase.evaluate(self.single)
 
-    def follow(self):
-        return self.current_phase.follow(self.single)
+    def proceed(self):
+        return self.current_phase.proceed(self.single)
 
     def update(
         self,
         phase_name: str = None,
         type: PhaseUpdateType = PhaseUpdateType.PRIMARY,
-        msg: str = None
+        msg: str = None,
     ):
-        if type == PhaseUpdateType.FOLLOW:
+        if type == PhaseUpdateType.PROCEED:
             yield msg
         else:
-            phase: Phase = getattr(self.phases, phase_name)
-            self.current_phase = phase
-            instruction = self.current_phase.update(self.single, type)
-            yield from self.stream(instruction)
+            if phase_name == "terminate":
+                yield from self.stream("We are terminating the interview. Say thanks to the candidate one more time and wish them best luck.")
+                self.terminated = True
+            else:
+                phase: Phase = getattr(self.phases, phase_name)
+                self.current_phase = phase
+                instruction = self.current_phase.primary(self.single, self.application.id)
+                yield from self.stream(instruction)
 
     def get_model(self):
-        document = Document(get_filepath("instruction", "system.md"))
+        document = Document(get_path("instruction", "system.md"))
         system_instruction = document.content.format(
             job_document=self.parse_document("job"),
             candidate_document=self.parse_document("candidate"),
@@ -79,13 +108,13 @@ class LLM:
         data: ApplicationData = getattr(self.application, type)
 
         rootname = os.path.splitext(data.document.filename)[0]
-        parsed_filepath = get_filepath("cache", f"parsed_{type}_{rootname}.md")
+        parsed_filepath = get_path("cache", f"parsed_{type}_{rootname}.md")
 
         document = None
         if os.path.isfile(parsed_filepath):
             document = read_file(parsed_filepath)
         else:
-            instruction = Document(get_filepath("instruction", "system_parse_doc.md"))
+            instruction = Document(get_path("instruction", "system_parse_doc.md"))
             system_instruction = instruction.content.format(
                 document_type=data.document.filetype,
                 document_name=data.document.title,
@@ -96,7 +125,7 @@ class LLM:
                 self.model_name, system_instruction=system_instruction
             )
 
-            instruction1 = Document(get_filepath("instruction", f"parse_{type}.md"))
+            instruction1 = Document(get_path("instruction", f"parse_{type}.md"))
             response = helper_model.generate_content(instruction1.content)
             document = response.text
             write_file(parsed_filepath, document)

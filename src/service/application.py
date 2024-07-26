@@ -2,7 +2,7 @@ import os
 
 from src.service.document import Document, DocumentNotFoundError
 from src.settings import APPLICATIONS, DIRECTORIES
-from src.utils import get_filepath
+from src.utils import get_path
 
 class ApplicationNotFoundError(RuntimeError):
     pass
@@ -20,8 +20,8 @@ class ApplicationData:
         return "Candidate Profile"
 
     def load_document(self):
-        md_path = get_filepath(self.type, f"{self.id}.md")
-        txt_path = get_filepath(self.type, f"{self.id}.txt")
+        md_path = get_path(self.type, f"{self.id}.md")
+        txt_path = get_path(self.type, f"{self.id}.txt")
         if os.path.exists(md_path):
             return Document(md_path, self.entitle_document())
         elif os.path.exists(txt_path):

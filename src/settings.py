@@ -8,6 +8,7 @@ DIRECTORIES = {
     "instruction": "data/model_instructions/",
     "cache": "data/caches",
     "report": "data/reports",
+    "conversation": "data/conversations",
 }
 
 APPLICATIONS = {

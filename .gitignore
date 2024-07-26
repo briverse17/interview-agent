@@ -165,4 +165,5 @@ cython_debug/
 
 data/caches/*
 data/reports/*
+data/conversations/*
 !**/.gitkeep 
