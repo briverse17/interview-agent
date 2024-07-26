@@ -19,6 +19,7 @@ if "report" not in st.session_state:
 if "terminated" not in st.session_state:
     st.session_state["terminated"] = None
 
+
 @st.experimental_dialog("Tips")
 def show_tips():
     st.info(

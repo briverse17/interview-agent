@@ -57,9 +57,7 @@ class LLM:
                 "/* No more than 3 points */"
             )
         )
-        filepath = get_path(
-            "report", f"{self.application.id}_{self.timestamp}.md"
-        )
+        filepath = get_path("report", f"{self.application.id}_{self.timestamp}.md")
         write_file(filepath, report)
         return report
 
@@ -85,12 +83,16 @@ class LLM:
             yield msg
         else:
             if phase_name == "terminate":
-                yield from self.stream("We are terminating the interview. Say thanks to the candidate one more time and wish them best luck.")
+                yield from self.stream(
+                    "We are terminating the interview. Say thanks to the candidate one more time and wish them best luck."
+                )
                 self.terminated = True
             else:
                 phase: Phase = getattr(self.phases, phase_name)
                 self.current_phase = phase
-                instruction = self.current_phase.primary(self.single, self.application.id)
+                instruction = self.current_phase.primary(
+                    self.single, self.application.id
+                )
                 yield from self.stream(instruction)
 
     def get_model(self):

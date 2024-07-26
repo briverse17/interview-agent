@@ -3,7 +3,8 @@ from streamlit_user_device import user_device
 
 import src.utils as utils
 from src.service.application import Application, ApplicationNotFoundError
-from src.service.document import DocumentNotFoundError, DocumentTypeNotSupportedError
+from src.service.document import (DocumentNotFoundError,
+                                  DocumentTypeNotSupportedError)
 
 st.set_page_config(
     page_title="Interview Agent",

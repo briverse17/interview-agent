@@ -4,6 +4,7 @@ from src.service.document import Document, DocumentNotFoundError
 from src.settings import APPLICATIONS, DIRECTORIES
 from src.utils import get_path
 
+
 class ApplicationNotFoundError(RuntimeError):
     pass
 

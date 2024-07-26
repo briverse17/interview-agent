@@ -16,7 +16,7 @@ class DocumentTypeNotSupportedError(RuntimeError):
 
 
 class Document:
-    def __init__(self, path: str, title: str=None):
+    def __init__(self, path: str, title: str = None):
         self.path = path
         self.title = title
         self.filename: str
@@ -60,4 +60,3 @@ class Document:
             return content
         else:
             raise DocumentBlankError(f"Document is blank: {self.filename}")
-
