@@ -1,6 +1,6 @@
 Task:
 - We are at the 'Starting Phase' of the interview
-- Process the 'Candidate Answers' inserted below carefully
+- Process the 'Candidate Answer' inserted below carefully
 - Evaluate their initial manifestation according to these criteria:
     - Comfort: in percentages, how would you rate their comfort level?
     - Confidence: in percentages, how would you rate their confidence level?
@@ -15,4 +15,7 @@ Task:
     Relevance: 89
 
 ---
-{history}
+Question asked: "{question}"
+
+---
+Candidate Answer: "{answer}"

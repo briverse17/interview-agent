@@ -1,4 +1,5 @@
 import os
+import string
 import time
 from enum import Enum
 from typing import Callable, Dict, List
@@ -24,6 +25,7 @@ class HistoryEntryItem:
             return "assistant"
         if self.role == "answer":
             return "user"
+
 
 class HistoryEntry:
     def __init__(self) -> None:
@@ -59,10 +61,10 @@ class HistoryEntry:
 
 class Instructions:
     def __init__(self, prefix: str) -> None:
-        primary_filepath = get_filepath("instruction", prefix, "primary.md")
-        questions_filepath = get_filepath("instruction", prefix, "questions.md")
-        eval_filepath = get_filepath("instruction", prefix, "eval.md")
-        follow_filepath = get_filepath("instruction", prefix, "follow.md")
+        primary_filepath = get_filepath("instruction", f"{prefix}/primary.md")
+        questions_filepath = get_filepath("instruction", f"{prefix}/questions.md")
+        eval_filepath = get_filepath("instruction", f"{prefix}/eval.md")
+        follow_filepath = get_filepath("instruction", f"{prefix}/follow.md")
 
         self.primary = Document(primary_filepath, f"{prefix}".upper())
         self.questions = Document(questions_filepath, f"{prefix}_questions".upper())
@@ -104,21 +106,21 @@ class Phase:
         match self.name:
             case "start":
                 if "technical_phase" in following:
-                    return "technical", PhaseUpdateType.PRIMARY
+                    return "technical", PhaseUpdateType.PRIMARY, None
             case "technical":
                 if "behavioral_phase" in following:
-                    return "behavioral", PhaseUpdateType.PRIMARY
+                    return "behavioral", PhaseUpdateType.PRIMARY, None
             case "behavioral":
                 if "experience_phase" in following:
-                    return "experience", PhaseUpdateType.PRIMARY
+                    return "experience", PhaseUpdateType.PRIMARY, None
             case "experience":
                 if "qna_phase" in following:
-                    return "qna", PhaseUpdateType.PRIMARY
+                    return "qna", PhaseUpdateType.PRIMARY, None
             case "qna":
                 if "finish_phase" in following:
-                    return "finish", PhaseUpdateType.PRIMARY
+                    return "finish", PhaseUpdateType.PRIMARY, None
 
-        return self.name, PhaseUpdateType.FOLLOW
+        return self.name, PhaseUpdateType.FOLLOW, following
 
     def update_history(self, type: str, content: str):
         if type == "question":
@@ -131,16 +133,33 @@ class Phase:
             history += f'Question: "{item.question.content}"\n'
             history += f'Answer: "{item.answer.content}"\n'
 
-        last_eval = getattr(self.history[-1], "evaluation", None)
+        last_eval = self.get_last("evaluation")
         if last_eval:
             history += f'Last Evaluation: "{last_eval.content}"\n'
         return history
 
+    def get_last(self, type: str):
+        last_entry = self.history[-1]
+        return getattr(last_entry, type, None)
+
     def populate(self, step: str):
         kwargs = {}
-        if step != "primary":
-            history = self.stringify_history()
-            kwargs = {"questions": self.questions, "history": history}
+        params = getattr(self.instructions, step).params
+        for param in params:
+            match param:
+                case "question":
+                    kwargs["question"] = self.get_last("question")
+                case "answer":
+                    kwargs["answer"] = self.get_last("answer")
+                case "evaluation":
+                    kwargs["evaluation"] = self.get_last("evaluation")
+                case "history":
+                    kwargs["history"] =  self.stringify_history()
+                case "questions":
+                    kwargs["questions"] = self.questions
+                case _:
+                    add_debug(f"{self.name} - {step} population", f"Unknown param {param}")
+
         populated = getattr(self.instructions, step).content.format(**kwargs)
         return populated
 

@@ -1,10 +1,7 @@
 Task:
 - We are at the 'Starting Phase' of the interview
 - We have an the 'Evaluation' of the candidate answer as inserted below
-- Process the 'Evaluation' carefully
-- If all criteria are above 50%, return a single string "technical_phase"
-- Else, encourage the candidate adjust their answer accordingly
+- If the Politeness criteria is below 50%, encourage the candidate to adjust their tone
+- Otherwise, you must return a single string "technical_phase"
 ---
-{history}
-
-{questions}
+{evaluation}

@@ -1,4 +1,5 @@
 import os
+import string
 
 from src.utils import read_file
 
@@ -60,3 +61,9 @@ class Document:
             return content
         else:
             raise DocumentBlankError(f"Document is blank: {self.filename}")
+
+    @property
+    def params(self):
+        return [
+            tup[1] for tup in string.Formatter().parse(self.content) if tup[1] is not None
+        ]

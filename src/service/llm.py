@@ -6,7 +6,7 @@ import google.generativeai as genai
 
 from src.service.application import Application, ApplicationData
 from src.service.document import Document
-from src.service.phase import Phase, Phases, PhaseUpdateType
+from src.service.phase import HistoryEntryItem, Phase, Phases, PhaseUpdateType
 from src.settings import APIKEY
 from src.utils import add_debug, get_filepath, read_file, write_file, write_json
 
@@ -18,21 +18,31 @@ class LLM:
         self.model_name = model_name
         self.application = application
         self.model = self.get_model()
-        # self.session = self.model.start_chat(history=[])
+        self.session = self.model.start_chat(history=[])
         self.phases = Phases()
         self.current_phase: Phase = None
+
+    @property
+    def chat_history(self):
+        for phase_name in ("start", "technical", "behavioral", "experience", "qna", "finish"):
+            phase: Phase = getattr(self.phases, phase_name)
+            for entry in phase.history:
+                for item_name in ("question", "answer"):
+                    item: HistoryEntryItem = getattr(entry, item_name, None)
+                    if item:
+                        yield item
 
     def single(self, content):
         return self.model.generate_content(content).text
 
     def stream(self, content):
-        response = self.model.generate_content(content, stream=True)
+        response = self.session.send_message(content, stream=True)
         for chunk in response:
             yield chunk.text.rstrip("\n")
 
-    def write_report(self):
-        report_filepath = get_filepath("report", f"{self.code}_{self.timestamp}.json")
-        write_json(report_filepath, self.report)
+    # def write_report(self):
+    #     report_filepath = get_filepath("report", f"{self.code}_{self.timestamp}.json")
+    #     write_json(report_filepath, self.report)
 
     def eval(self):
         self.current_phase.evaluate(self.single)
@@ -44,11 +54,15 @@ class LLM:
         self,
         phase_name: str = None,
         type: PhaseUpdateType = PhaseUpdateType.PRIMARY,
+        msg: str = None
     ):
-        phase: Phase = getattr(self.phases, phase_name)
-        self.current_phase = phase
-        instruction = self.current_phase.update(self.single, type)
-        yield from self.stream(instruction)
+        if type == PhaseUpdateType.FOLLOW:
+            yield msg
+        else:
+            phase: Phase = getattr(self.phases, phase_name)
+            self.current_phase = phase
+            instruction = self.current_phase.update(self.single, type)
+            yield from self.stream(instruction)
 
     def get_model(self):
         document = Document(get_filepath("instruction", "system.md"))
